@@ -46,7 +46,7 @@ git clone git@github.com:CIT-Autonomous-Robot-Lab/raspicat-docker.git
 cd raspicat-docker/ros2-humble-gpu 
 docker build --build-arg DEFAULT_USER=<user> -t <image_name>:<TAG> -f Dockerfile .
 ```
-GPUを搭載していない場合はraspicat/ros2-humbleに移動して上記のbuildコマンドを入力してください。
+GPUを搭載していない場合は`raspicat/ros2-humble`に移動して上記のbuildコマンドを入力してください。
 
 ・user: ローカルのユーザ名
 
@@ -85,9 +85,15 @@ su <user>
 ```
 exit
 ```
+### 6. .sshディレクトリのアンマウント
+sshディレクトリのアンマウントはコンテナ内でユーザをrootに変更して行ってください
+```
+umount /home/<user>/.ssh 
+```
 
-### 6. 実行中のコンテナを新しいイメージにコミット
+### 7. 実行中のコンテナを新しいイメージにコミット
 以下のコマンドはローカルで実行してください。
+
 起動中のコンテナのコンテナIDを取得
 ```
 docker ps
@@ -96,8 +102,9 @@ docker ps
 ```
 docker container commit <container_id> <image_name>:<TAG> 
 ```
-### 7. .sshディレクトリのアンマウント
-sshディレクトリのアンマウントはユーザをrootに変更して行ってください
+
+### 8.コンテナから出る
+コンテナ内で以下のコマンドを実行してください。（rootユーザで実行）
 ```
-umount /home/<user>/.ssh 
+exit
 ```
