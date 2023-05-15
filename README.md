@@ -3,10 +3,36 @@ ROS 2のhumbleを使うためのDockerfileです。
 
 sshkeyの設定は[こちらのサイト](https://qiita.com/shizuma/items/2b2f873a0034839e47ce)を参照してください。
 
-## dockerのインストール
+## dockerの環境構築
+### 1. dockerのインストール
 ```
 sudo apt install docker.io
 ```
+### 2. dockerのコマンドをsudoなしで実行するための設定
+dockerグループに所属しているユーザが確認できる。
+```
+getent group docker
+```
+設定前だと以下のように出力される。
+
+例: `docker:x:138:`
+
+以下のコマンドでユーザ名を確認できます。
+```
+whoami
+```
+例: `leon`
+
+dockerグループにPCのユーザを追加します。
+
+```
+sudo gpasswd -a <user> docker
+```
+追加後に`getent group docker`を実行すると以下のように出力されます。
+
+例: `docker:x:138:leon`
+
+dockerグループに所属してから一度ログアウトしてから再ログインするとsudoなしでdockerコマンドを使用できるようになります。
 
 ## リポジトリのクローン
 ```
@@ -36,7 +62,7 @@ whoami
 ```
 docker images <image_name>:<TAG>
 ```
-### 3. イメージでGUIを使用すつために以下のコマンドを実行
+### 3. イメージでGUIを使用するために以下のコマンドを実行
 ```
 xhost local:<IMAGE ID>
 ```
