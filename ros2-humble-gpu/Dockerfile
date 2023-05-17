@@ -36,7 +36,10 @@ WORKDIR /home/$DEFAULT_USER/raspicat_ws
 
 RUN rosdep update 
 RUN rosdep install -r -y --from-paths --ignore-src ./ 
-RUN source /opt/ros/humble/setup.bash
+SHELL ["/bin/bash", "-c", "-l"]
+RUN source /opt/ros/humble/setup.bash && \
+    colcon build --symlink-install && \
+    . install/setup.bash
 
 WORKDIR /home/$DEFAULT_USER/raspicat_ws/src/raspicat_sim/raspicat_gazebo/scripts/
 
