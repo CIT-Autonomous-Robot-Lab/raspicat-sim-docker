@@ -1,5 +1,5 @@
-# ros2-humble-docker
-ROS 2のhumbleを使うためのDockerfileです。
+# raspicat-ros2-humble-docker
+ROS 2のhumbledeでRaspberry Pi Catのシミュレータ使うためのDockerfileです。
 
 sshkeyの設定は[こちらのサイト](https://qiita.com/shizuma/items/2b2f873a0034839e47ce)を参照してください。
 
@@ -39,37 +39,51 @@ dockerグループに所属してから一度ログアウトしてから再ロ�
 git clone git@github.com:CIT-Autonomous-Robot-Lab/raspicat-docker.git
 ```
 
-## 実行
+## コンテナを起動
 
 ### 1. イメージの作成
 ```
 cd raspicat-docker/ros2-humble-gpu 
-docker build --build-arg DEFAULT_USER=<user> -t <image_name>:<TAG> -f Dockerfile .
+docker build --build-arg DEFAULT_USER=$USER -t raspicat:humble -f Dockerfile .
 ```
 GPUを搭載していない場合は`raspicat/ros2-humble`に移動して上記のbuildコマンドを入力してください。
 
-・user: ローカルのユーザ名
+・raspicat: 作成するdockerイメージの名前
 
-・image_name: 作成するdockerイメージの名前
+・humble: 作成するdockerイメージのTAG名
 
-・TAG: 作成するdockerイメージのTAG名
+(任意で変更可能)
 
-ローカルのユーザ名は以下のコマンドで確認してください。
-```
-whoami
-```
+使用するDockerfileはbuildの際に以下のアプリケーションをインストールします。
+
+・vim
+
+・git 
+
+・terminator
+
+・wget
+
 ### 2. 使用するイメージのIMAGE IDを取得
 ```
-docker images <image_name>:<TAG>
+docker images raspicat:humble
 ```
+指定したdockerイメージのIMAGE IDが出力されます。
+
+例: `test2    colcon    77bf3192b4db   2 days ago   5.52GB`
+
+左からREPOSITORY、TAG、IMAGE ID、CREATED、SIZEを表しています。
+
 ### 3. イメージでGUIを使用するために以下のコマンドを実行
 ```
 xhost local:<IMAGE ID>
 ```
 ### 4. コンテナ起動
 ```
-docker run --rm -it --privileged --gpus all --net=host --ipc=host --env="DISPLAY=$DISPLAY" --runtime=nvidia --mount type=bind,source=/home/<user>/.ssh,target=/home/<user>/.ssh <image_name>:<TAG>
+docker run --rm -it --privileged --gpus all --net=host --ipc=host --env="DISPLAY=$DISPLAY" --runtime=nvidia --mount type=bind,source=/home/$USER/.ssh,target=/home/$USER/.ssh raspicat:humble
 ```
+・--rmを使用して、コンテナが終了した後に自動的にコンテナを削除することを指定します。
+
 ・--gpu allを使用して、コンテナがホストシステムに接続されてGPUを利用可能にしています。
 
 ・--runtime=nvidiaを使用して、Dockerのコンテナ内でNVIDIA GPUを使用するためのランタイムを設定しています。
@@ -77,16 +91,62 @@ docker run --rm -it --privileged --gpus all --net=host --ipc=host --env="DISPLAY
 （GPUを搭載していない場合は、--gpu allと--runtime=nvidiaオプションは付けずに実行してください。）
 
 ・--mountを使用して、ローカルの.sshディレクトリをコンテナの起動時にマウントするようにしています。
-### 5. コンテナ内でユーザを変更
+
+## Raspberry Pi Catのシミュレータ
+
+### 1. terminatorの起動
+```
+terminator
+```
+terminatorを起動すると新たなターミナルが起動します。
+
+次の操作のためにターミナルを分割して3つにしてください。
+
+terminatorでよく使うコマンド
+
+・Ctrl+Shift+Eで縦に分割
+
+・Ctrl+Shift+Oで横に分割
+
+・Ctrl+Dで指定しているターミナルを削除
+
+### 2. 各ターミナルでsource
+以下のコマンドを作成した３つターミナルすべてで行ってをください。
+```
+. install/setup.bash
+```
+
+### 3. Raspberry Pi Catのシミュレータ
+１つ目のターミナルで以下のコマンドを実行してください。
+```
+ros2 launch raspicat_gazebo raspicat_with_iscas_museum.launch.py
+```
+２つ目のターミナルで以下のコマンドを実行してください。
+```
+ros2 service call /motor_power std_srvs/SetBool '{data: true}'
+```
+３つ目のターミナルで以下のコマンドを実行してください。
+```
+ros2 launch raspicat_navigation raspicat_nav2.launch.py
+```
+３つのコマンドを実行したら、GazeboとRvizが立ち上がっていると思います。
+
+Rvizで初期位置を設定すればナビゲーションを開始できます。
+
+## コンテナ内でgit clone
+
+git clone を行う場合はコンテナ内でユーザをrootからローカルのユーザに変更してください。
+
+コンテナ内で以下のコマンドを実行することでユーザをローカルのユーザに変更できます。
 ```
 su <user>
 ```
-変更後にユーザをrootに戻すときは以下のコマンドを実行
+変更後にユーザをrootに戻すときは以下のコマンドを実行してください。
 ```
 exit
 ```
-### 6. .sshディレクトリのアンマウント
-sshディレクトリのアンマウントはコンテナ内でユーザをrootに変更して行ってください
+## .sshディレクトリのアンマウント
+sshディレクトリのアンマウントはコンテナ内でユーザをrootに変更して行ってください。
 ```
 umount /home/<user>/.ssh 
 ```
@@ -102,6 +162,9 @@ docker ps
 ```
 docker container commit <container_id> <image_name>:<TAG> 
 ```
+`<image_name>:<TAG>`は起動しているコンテナと同じにすればイメージを上書きできます。
+
+新しいイメージとして保存したい場合は、任意のイメージ名とTAG名をつけてください。
 
 ### 8.コンテナから出る
 コンテナ内で以下のコマンドを実行してください。（rootユーザで実行）
