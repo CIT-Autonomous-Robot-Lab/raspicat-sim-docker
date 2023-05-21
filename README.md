@@ -14,9 +14,10 @@ sudo apt install docker.io
 
 ```
 sudo gpasswd -a $USER docker
+sudo reboot
 ```
 
-dockerグループに所属してから一度ログアウトしてから再ログインすると  
+PCを再起動すると  
 sudoなしでdockerコマンドを使用できるようになります。
 
 ## コンテナを起動
@@ -27,7 +28,7 @@ sudoなしでdockerコマンドを使用できるようになります。
 ```
 git clone https://github.com/CIT-Autonomous-Robot-Lab/raspicat-sim-docker
 cd raspicat-sim-docker/ros2-humble-gpu 
-docker build --build-arg DEFAULT_USER=$USER -t raspicat:humble -f Dockerfile .
+docker build --build-arg USERNAME=$USER -t raspicat:humble -f Dockerfile .
 ```
 
 * GPUなし
@@ -92,8 +93,8 @@ GazeboとRVizが立ち上がっていると思います。
 RVizで初期位置を設定すると、ナビゲーションを開始できます。
 
 ## 注意
-`docker commit`を実行する場合、  
-sshディレクトリのアンマウントをしてからにしましょう。（セキュリティー対策）
+`docker commit`を実行する前に、  
+sshディレクトリのアンマウントを行いましょう。（セキュリティー対策）
 
 ### .sshディレクトリのアンマウント
 ```
