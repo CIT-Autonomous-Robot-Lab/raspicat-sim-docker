@@ -28,7 +28,7 @@ sudoなしでdockerコマンドを使用できるようになります。
 ```
 git clone https://github.com/CIT-Autonomous-Robot-Lab/raspicat-sim-docker
 cd raspicat-sim-docker/ros2-humble-gpu 
-docker build --build-arg USERNAME=$USER -t raspicat:humble -f Dockerfile .
+docker build --build-arg USERNAME=$USER -t raspicat-sim:humble -f Dockerfile .
 ```
 
 * GPUなし
