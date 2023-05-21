@@ -29,6 +29,7 @@ RUN mkdir -p /home/$USERNAME/raspicat_ws/src && \
     rosdep update && \
     rosdep install -r -y --from-paths --ignore-src ./
 
+WORKDIR /home/$USERNAME/raspicat_ws/
 RUN source /opt/ros/humble/setup.bash && \
     colcon build --symlink-install && \ 
     echo "source /opt/ros/humble/setup.sh" >>/home/$USERNAME/.bashrc && \
