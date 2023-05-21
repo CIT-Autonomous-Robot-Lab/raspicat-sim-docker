@@ -8,6 +8,7 @@ ENV NVIDIA_VISIBLE_DEVICES \
     ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+ENV USER=$USERNAME
 ENV USERNAME=$USERNAME
 
 RUN groupadd -g 1000 $USERNAME && \
@@ -33,10 +34,10 @@ RUN mkdir -p /home/$USERNAME/raspicat_ws/src && \
     rosdep update && \
     rosdep install -r -y --from-paths --ignore-src ./
 
-WORKDIR /home/$USERNAME/raspicat_ws/src
 RUN source /opt/ros/humble/setup.bash && \
     colcon build --symlink-install && \ 
     echo "source /opt/ros/humble/setup.sh" >>/home/$USERNAME/.bashrc && \
     echo "source /home/$USERNAME/raspicat_ws/install/setup.bash" >>/home/$USERNAME/.bashrc
 
+WORKDIR /home/$USERNAME/raspicat_ws/src
 CMD ["/bin/bash"]
