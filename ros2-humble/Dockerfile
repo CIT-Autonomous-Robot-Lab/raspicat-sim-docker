@@ -13,9 +13,10 @@ RUN groupadd -g 1000 $USERNAME && \
 
 RUN apt update && apt upgrade -y && \
     apt install -y \
-    vim \
+    eog \
     git \
     terminator \
+    vim \
     wget
 
 USER $USERNAME
