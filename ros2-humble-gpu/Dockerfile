@@ -22,7 +22,8 @@ RUN apt update && apt upgrade -y && \
     git \
     terminator \
     vim \
-    wget
+    wget \
+    xterm
 
 USER $USERNAME
 RUN mkdir -p /home/$USERNAME/raspicat_ws/src && \
