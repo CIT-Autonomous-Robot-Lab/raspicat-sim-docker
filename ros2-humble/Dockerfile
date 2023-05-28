@@ -5,6 +5,8 @@ SHELL ["/bin/bash", "-c"]
 ARG USERNAME="root"
 ENV USER=$USERNAME
 ENV USERNAME=$USERNAME
+ENV GIT_PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w$(__git_ps1)\[\033[00m\](\t)\$ "
+ENV NO_GIT_PS1="${debian_chroot:+($debian_chroot)}\u@\h:\w \$ "
 
 RUN groupadd -g 1000 $USERNAME && \
     useradd -m -s /bin/bash -u 1000 -g 1000 -d /home/$USERNAME $USERNAME && \
@@ -37,11 +39,16 @@ RUN source /opt/ros/humble/setup.bash && \
     colcon build --symlink-install && \
     : "remove cache" && \
     sudo apt-get autoremove -y -qq && \
-    sudo rm -rf /var/lib/apt/lists/* && \
-    rm -r build log && \
-    echo "source /opt/ros/humble/setup.sh" >>/home/$USERNAME/.bashrc && \
-    echo "source /home/$USERNAME/raspicat_ws/install/setup.bash" >>/home/$USERNAME/.bashrc && \
-    echo "source /etc/bash_completion" >> /home/$USERNAME/.bashrc
+    sudo rm -rf /var/lib/apt/lists/*
+
+RUN echo "source /opt/ros/humble/setup.sh" >> $HOME/.bashrc && \
+    echo "source /home/$USERNAME/raspicat_ws/install/setup.bash" >> $HOME/.bashrc && \
+    echo "source /etc/bash_completion" >> $HOME/.bashrc && \
+    echo "if [ -f /etc/bash_completion.d/git-prompt ]; then" >> $HOME/.bashrc && \
+    echo "    export PS1='${GIT_PS1}'" >> $HOME/.bashrc && \
+    echo "else" >> $HOME/.bashrc && \
+    echo "    export PS1='${NO_GIT_PS1}'" >> $HOME/.bashrc && \
+    echo "fi" >> $HOME/.bashrc
 
 WORKDIR /home/$USERNAME/raspicat_ws/src
 CMD ["/bin/bash"]
