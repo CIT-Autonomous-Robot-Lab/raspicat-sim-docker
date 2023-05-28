@@ -18,6 +18,7 @@ RUN groupadd -g 1000 $USERNAME && \
 
 RUN apt update && apt upgrade -y && \
     apt install -y \
+    bash-completion \
     eog \
     git \
     terminator \
@@ -39,8 +40,13 @@ RUN mkdir -p /home/$USERNAME/raspicat_ws/src && \
 WORKDIR /home/$USERNAME/raspicat_ws/
 RUN source /opt/ros/humble/setup.bash && \
     colcon build --symlink-install && \ 
-    echo "source /opt/ros/humble/setup.sh" >>/home/$USERNAME/.bashrc && \
-    echo "source /home/$USERNAME/raspicat_ws/install/setup.bash" >>/home/$USERNAME/.bashrc
+    : "remove cache" && \
+    sudo apt-get autoremove -y -qq && \
+    sudo rm -rf /var/lib/apt/lists/* && \
+    rm -r build log && \
+    echo "source /opt/ros/humble/setup.sh" >> /home/$USERNAME/.bashrc && \
+    echo "source /home/$USERNAME/raspicat_ws/install/setup.bash" >> /home/$USERNAME/.bashrc && \
+    echo "source /etc/bash_completion" >> /home/$USERNAME/.bashrc
 
 WORKDIR /home/$USERNAME/raspicat_ws/src
 CMD ["/bin/bash"]
