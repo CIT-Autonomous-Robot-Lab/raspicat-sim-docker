@@ -59,6 +59,7 @@ docker run --rm -it \
            --env="DISPLAY=$DISPLAY" \
            --mount type=bind,source=/home/$USER/.ssh,target=/home/$USER/.ssh \
            --mount type=bind,source=/home/$USER/.gitconfig,target=/home/$USER/.gitconfig \
+           --mount type=bind,source=/usr/share/zoneinfo/Asia/Tokyo,target=/etc/localtime \
            --name raspicat-sim \
            raspicat-sim:humble
 ```
@@ -73,6 +74,7 @@ docker run --rm -it \
            --env="DISPLAY=$DISPLAY" \
            --mount type=bind,source=/home/$USER/.ssh,target=/home/$USER/.ssh \
            --mount type=bind,source=/home/$USER/.gitconfig,target=/home/$USER/.gitconfig \
+           --mount type=bind,source=/usr/share/zoneinfo/Asia/Tokyo,target=/etc/localtime \
            --name raspicat-sim \
            raspicat-sim:humble
 ```
